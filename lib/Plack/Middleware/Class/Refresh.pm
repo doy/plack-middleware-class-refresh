@@ -10,9 +10,12 @@ use base 'Plack::Middleware';
 sub call {
     my $self = shift;
 
-    my @changed = Class::Refresh->modified_modules;
-    warn "Classes " . join(', ', @changed) . " have been changed, refreshing"
-        if $self->verbose && @changed;
+    if ($self->verbose && (my @changed = Class::Refresh->modified_modules)) {
+        warn ((@changed > 1
+                 ? "Classes " . join(', ', @changed) . " have"
+                 : "Class $changed[0] has")
+           . " been changed, refreshing");
+    }
 
     Class::Refresh->refresh;
 
